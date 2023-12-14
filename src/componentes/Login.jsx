@@ -1,70 +1,131 @@
 import React from 'react';
 import axios from 'axios';
-import { useState, useContext, useEffect } from 'react';
+import { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../App.css';
 import Contexto from '../Contexto/Contexto';
 import Swal from 'sweetalert2';
 
-
 function Login() {
 
-  const [data, setData] = useState([]);
+
   const {usuario, contraseña, user, pass, setLogueado, setUsuario} = useContext(Contexto);
   const navigate = useNavigate();
   const [palabra, setPalabra] = useState("Usuario");
 
+  // FUNCION PARA HASHEAR
+  const hashToken = (token) => {
+    
+    const CryptoJS = require('crypto-js');
+    const key = "claveRandom";
+    const cifrado = CryptoJS.AES.encrypt(token, key).toString();
+  
+    console.log('Cifrado:', cifrado);
 
-  useEffect( () => {
-    axios.get('http://localhost:8080/api/usuarios')
-      .then(response => {
-        setData(response.data);
-      })
-      .catch(error => {
-        console.error('Error al obtener los datos:', error);
-      });
-  },[])
-
-
-  // Aqui comprobar que el usuario y contraseña son correctos
-  const comprobar = () => {
-    var pasar = false;
-    for(var i = 0; i < data.length; i++){
-      if(usuario.nombre === data[i].usuario && contraseña === data[i].contraseña){
-        setLogueado(true);
-        pasar = true;
-        const newUser = {
-          nombre: data[i].usuario,
-          id: data[i].id
-        }
-        setUsuario(newUser);
-        console.log(data[i].id)
-        break;
-      }
-    }
-    if(pasar === true){
-      navigate('/');
-    }
-    else{
-      Swal.fire({
-        title: "Usuario o Contraseña incorrecta",
-        icon: "error",
-      })
-    }
+    return cifrado;
   }
 
 
-  // Peticion POST para agregar nuevo usuario
+  // COMPROBAR que el USUARIO y CONTRASEÑA son CORRECTOS
+  const comprobar = () => {
+    var pasar = false;
+    // Traigo los usuarios
+    axios.get('http://localhost:8080/api/usuarios')
+      .then(response => {
+        // Comprobacion
+        for(var i = 0; i < response.data.length; i++){
+          if(usuario.nombre === response.data[i].usuario && contraseña === response.data[i].contraseña){
+            
+            pasar = true;
+            console.log(pasar);
+            const newUser = {
+              nombre: response.data[i].usuario,
+              id: response.data[i].id
+            }
+            
+            // Creo la cookie con la que voy a mantener la sesión iniciada (durante 1 hora)
+            const fechaExpiracion = new Date(); // Creo fecha en la que estamos
+            fechaExpiracion.setTime(fechaExpiracion.getTime() + 60 * 60 * 1000); // Le sumo una hora a la hora actual
+            document.cookie = `User=${response.data[i].token}; expires=${fechaExpiracion.toUTCString()}`;
+
+            setLogueado(true);
+            setUsuario(newUser);
+            break;
+          }
+        }
+      })
+      .then(() => {
+        if(pasar === true){
+          navigate('/');
+        }
+        else{
+          Swal.fire({
+            title: "Usuario o Contraseña incorrecta",
+            icon: "error",
+          })
+        }
+      })
+      .catch(error => {
+        console.error('Error al obtener los datos:', error);
+    });
+    
+    
+  }
+
+
+  // Peticion POST para AGREGAR NUEVO USUARIO
   const agregar = () => {
-    axios.post('http://localhost:8080/api', {
-      usuario: usuario.nombre,
-      contraseña: contraseña
-    })
-    .then(response => {
-      if (response.status === 200) {
-        Swal.fire('Usuario Añadido!')
-      }
-    })
+    var pasar2 = true;
+    const hash = hashToken(usuario.nombre);
+    // Traigo los usuarios
+    axios.get('http://localhost:8080/api/usuarios')
+      .then(response => {
+        // Comprobar si el nombre de usuario es unico
+        for(var i = 0; i < response.data.length; i++){
+          if(response.data[i].usuario === usuario.nombre){
+            pasar2 = false;
+            Swal.fire({
+              title: "Usuario extistente, pruebe con otro",
+              icon: "error"
+            });
+            break;
+          }
+        }
+      })
+      .then(() => {
+        // Usurio no esta registrado y PASA
+        if(pasar2 === true){
+  
+          axios.post('http://localhost:8080/api', {
+            usuario: usuario.nombre,
+            contraseña: contraseña,
+            token: hash
+          })
+          .then(response => {
+            // Si la respuesta es 200 seteo el usuario y estar logueado a true
+            if (response.status === 200) {
+              setLogueado(true);
+              setUsuario({
+                nombre: usuario.nombre,
+                id: response.data.id
+              })
+
+              // Creo la cookie con la que voy a mantener la sesión iniciada (durante 1 hora)
+              const fechaExpiracion = new Date(); // Creo fecha en la que estamos
+              fechaExpiracion.setTime(fechaExpiracion.getTime() + 60 * 60 * 1000); // Le sumo una hora a la hora actual
+              document.cookie = `User=${hash}; expires=${fechaExpiracion.toUTCString()}`;
+
+              Swal.fire('Usuario Añadido!');
+              navigate('/');
+            }
+          })
+        }
+      })
+      .catch(error => {
+        console.error('Error al obtener los datos:', error);
+    });
+
+    
   }
 
   return (

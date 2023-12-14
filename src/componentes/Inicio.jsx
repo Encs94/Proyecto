@@ -7,14 +7,22 @@ import Contexto from '../Contexto/Contexto';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 
+import figuras from './../assets/figuritas.jpg';
+import han from './../assets/hanSolo.jpg';
+import juegos from './../assets/juegosdemesa.png';
+import mangas from './../assets/mangas.webp';
+import logo from './../assets/Sin título-2.svg';
+import comic from './../assets/comics.jpg';
+
 export default function Tienda() {
 
   const imagenes = require.context('./../assets', true);
   const [data, setData] = useState([]);
-  const {setPedido} = useContext(Contexto);
+  const {setPedido, logueado} = useContext(Contexto);
   const navigate = useNavigate();
   let carro = [];
 
+  // Traer los productos 
 
   useEffect(() => {
     // Realizar la petición GET cuando el componente se monte
@@ -78,25 +86,60 @@ export default function Tienda() {
     }
   }
 
+  // Agregar al carrito
   const agregarCarrito = (id) => {
-    carro.push(id);
-    Swal.fire({
-      title: "Producto añadido",
-      timer: 1000
-    })
+    if(logueado === true){
+      carro.push(id);
+      Swal.fire({
+        title: "Producto añadido",
+        timer: 1000
+      })
+    }
+    else {
+      Swal.fire({
+        title: "Debe registrarse primero",
+        icon: "error"
+      })
+      console.log(logueado)
+    }
   }
 
-
+  // Ir al carrito
   const irAlCarro = () => {
-    setPedido(carro);
-    navigate('/carro');
+    if(logueado === true){
+      setPedido(carro);
+      navigate('/carro');
+    }
+    else {
+      Swal.fire({
+        title: "Debe registrarse primero",
+        icon: "error"
+      })
+    }
+    
   }
 
 
   return (
     <Inicio>
       
-      <div className="container">
+      <div className="containerInicio">
+        <div className='containerTituloInicio'>
+          <h1 className='tituloh1'>Freak Games</h1>
+          <img className='Logoh1' src={logo} alt="imgLogo" />
+        </div>
+
+        <div className='containerBaner'>
+          <div className='baner'>
+            <img className='imgBaner' src={mangas} alt="img1" />
+            <img className='imgBaner' src={figuras} alt="img3" />
+            <img className='imgBaner' src={han} alt="img2" />
+            <img className='imgBaner' src={juegos} alt="img5" />
+            <img className='imgBaner' src={comic} alt="img4" />
+          </div>
+        </div>
+        
+        <h2 className='titulosInicio'>Nuestros  Productos</h2>
         <div className='buscadores'>
           <input onChange={busquedaletras} className='buscador' placeholder='    Buscar productos'/>
           <div>
@@ -109,7 +152,7 @@ export default function Tienda() {
             </select>
           </div>
           <div>
-            <button onClick={irAlCarro}>Carrito</button>
+            <button className='botonProducto' onClick={irAlCarro}>Carrito</button>
           </div>
         </div>
 
@@ -120,12 +163,12 @@ export default function Tienda() {
               <div className='infoProducto'>
                 <span className='nombreProducto'>{producto.nombre}</span>
                 <span className='precioProducto'>{producto.precio}€</span>
-                <button onClick={() => agregarCarrito(producto.id)}>Añadir al carro</button>
+                <button className='botonProducto' onClick={() => agregarCarrito(producto.id)}>Añadir al carro</button>
               </div>
             </div>      
           )) }
         </div>
-        {/* <button onClick={verCarro}>Ver</button> */}
+
       </div>
     </Inicio>
   )

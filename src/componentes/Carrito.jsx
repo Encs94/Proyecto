@@ -4,7 +4,10 @@ import Inicio from './Plantilla';
 import Contexto from '../Contexto/Contexto';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-// import Swal from 'sweetalert2'
+import Swal from 'sweetalert2';
+import sumar from '../assets/icons8-más-50.png';
+import restar from '../assets/signo-menos.png';
+import eliminar from '../assets/icons8-eliminar-48.png';
 
 function Carrito() {
 
@@ -40,7 +43,10 @@ function Carrito() {
         setPrecioT(temp)
       })
       .catch(error => {
-        console.error('Error al obtener los datos:', error);
+        Swal.fire({
+          title: "Aún no ha añadido productos",
+          icon: "error"
+        })
       });
   }, [pedido]);
 
@@ -69,12 +75,12 @@ function Carrito() {
   }
 
 
-  const cantidades = (id, cantidad) => {
+  const sumarCantidad = (id) => {
     var dataTemp = data;
     var precioTemp = 0;
     for(var i = 0;i < data.length ; i++){
       if(data[i].id === id){
-        dataTemp[i].cantidad = cantidad;
+        dataTemp[i].cantidad += 1;
         setData(dataTemp)
       }
     }
@@ -85,48 +91,73 @@ function Carrito() {
     setPrecioT(precioTemp)
   }
 
+  const restarCantidad = (id) => {
+    var dataTemp = data;
+    var precioTemp = 0;
+    for(var i = 0;i < data.length ; i++){
+      if(data[i].id === id){
+        dataTemp[i].cantidad -= 1;
+        setData(dataTemp)
+      }
+    }
+    // Refrescar precio
+    for(var j = 0; j < dataTemp.length; j++){
+      precioTemp += dataTemp[j].precio * dataTemp[j].cantidad
+    }
+    setPrecioT(precioTemp);
+  }
+
   
   return (
     <Inicio>
-      <div className='containerCarro'>
 
-        <div className="cajasCarro">
-          <h2>Pedido</h2>
+      <div className='containerTituloCarro'>
+        <h1 className='tituloCarro'>Tu Carrito</h1>
+      </div>
+
+      <div className='contenedorCarro'>
+
+        <div className="contenedorCajasCarro">
           {data.map((producto, i) => (
-
-            <div key={i} className=''>
-              <img className='imagenProduc' src={imagenes('./'+ producto.imagen +'.jpg')} alt={producto.nombre}/>
+            producto.cantidad >= 1 &&
+            <div key={i} className='containerProductos'>
+              <span className='nombreProductoCarro'>{producto.nombre}</span>
+              <img className='imagenProductoCarro' src={imagenes('./'+ producto.imagen +'.jpg')} alt={producto.nombre}/>
               <div className='infoProducto'>
-                <span className='nombreProducto'>{producto.nombre}</span>
-                <div>
-                  <span className='precioProducto'>{producto.precio}€</span>
-                  <span>Cantidad</span>
-                  <select onChange={(e) => cantidades(producto.id, e.target.value)}>
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="3">3</option>
-                    <option value="4">4</option>
-                    <option value="5">5</option>
-                    <option value="6">6</option>
-                    <option value="7">7</option>
-                    <option value="8">8</option>
-                    <option value="9">9</option>
-                    <option value="10">10</option>
-                  </select>
-                </div>
+                <span className='precioProductoCarro'>{producto.precio}€</span>
+                  {/* <select onChange={(e) => cantidades(producto.id, e.target.value)}> */}
               </div>
-              <button onClick={() => borrarProd(producto.id)}>Eliminar</button>
             </div>
-
           )) }
         </div>
 
-        <div className='detallesCompra'>
-          <span className='letra'>Productos {pedido.length}</span>
-          <span  className='letra'>Total: {precioT}€</span>
-          <button onClick={comprar}>Confirmar pedido</button>
+        <div className='containerDetalles'>
+          <div className="tituloDetalles">
+              <h2>Productos</h2>
+          </div>
+
+          {data.map((producto, i) => (
+            producto.cantidad >= 1 &&
+            <div className='productoDetalles' key={i}>
+                <p className='tituloProductoCarro'>{producto.nombre}</p>
+                <button onClick={() => {restarCantidad(producto.id)}} className='botonRestar'><img className='imagenRestar' src={restar} alt="" /></button>
+                <p className="cantidad">{producto.cantidad}</p>
+                <button onClick={() => {sumarCantidad(producto.id)}} className='botonSumar'><img className='imagenSumar' src={sumar} alt="" /></button>
+                <button className='botonEliminarCarro' onClick={() => borrarProd(producto.id)}><img className='imagenesIconos' src={eliminar}/></button>
+            </div>
+          ))}
+
+          <div className='totalCarrito'>
+            <div className='totalCarrito2'>
+              <strong>Total</strong>
+              <span>{precioT} €</span>
+            </div>
+            <button className='botonPagar' onClick={comprar}>Confirmar pedido</button>
+          </div>
+          
         </div>
-        
+
+
       </div>
     </Inicio>
   )
