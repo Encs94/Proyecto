@@ -25,7 +25,7 @@ module.exports = app => {
   // Buscar por categoria
   router.post("/prodCategory/:categoria", producto.findByCategory);
   // Buscar por letra
-  router.post("/prodLetra/:letra", producto.findByLetra);
+  router.post("/prodLetra", producto.findByLetra);
   // Buscar por id
   router.post("/prodId", producto.findById);
 

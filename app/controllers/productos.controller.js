@@ -14,7 +14,7 @@ exports.create = (req, res) => {
     return;
   }
 
-  // Acordarse cambiar los valores del producto para el producto
+
   const newProduct = {
     nombre: req.body.nombre,
     imagen: req.body.imagen,
@@ -48,12 +48,12 @@ exports.findAll = (req, res) => {
     .catch(err => {
       res.status(500).send({
         message:
-          err.message || "Some error occurred while retrieving tutorials."
+          err.message || "Some error occurred while retrieving product."
       });
     });
 };
 
-
+// Buscar por id
 exports.findOne = (req, res) => {
   const id = req.params.id;
 
@@ -100,24 +100,46 @@ exports.findByCategory = async (req, res) => {
   }
 };
 
-// Buscar por letra
+// Buscar por letra y categoria
 
 exports.findByLetra = async (req, res) => {
-  // Se usa params cuando se manda un dato por url, como en esta
-  const letra = req.params.letra;
+
+  const letra = req.body.letra;
+  const idCategoria = req.body.idCategoria;
+
+  var producto;
 
   try {
-    const producto = await Producto.findAll({
-      where: {
-        nombre: {
-          [Op.like]: `${letra}%`
+
+    // Busqueda solo por letra
+    if(idCategoria === ""){
+      console.log("Hola")
+      producto = await Producto.findAll({
+        where: {
+          nombre: {
+            [Op.like]: `%${letra}%`
+          }
         }
-      }
-    });
+      });
+    }
+
+    // Busqueda por letra y categoria
+    if(idCategoria !== ""){
+      console.log("Adios")
+      producto = await Producto.findAll({
+        where: {
+          nombre: {
+            [Op.like]: `%${letra}%`
+          },
+          idCategory: idCategoria
+        }
+      });
+    }
 
     if (producto.length > 0) {
       res.send(producto);
-    } else {
+    } 
+    else {
       res.status(404).send({
         message: `No producto found with letra=${letra}.`
       });
@@ -127,10 +149,10 @@ exports.findByLetra = async (req, res) => {
       message: "Error retrieving products with letra=" + letra
     });
   }
+    
 };
 
 // Traer productos con cierto id, para el carrito
-
 exports.findById = async (req, res) => {
   // Se usa body en las que se manda los datos en el cuerpo, como un objeto o array
   console.log(req.body);
