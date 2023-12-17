@@ -7,8 +7,6 @@ import expo from './../assets/expoBarcelona.jpeg';
 
 function Eventos() {
 
-  const imagenes = require.context('./../assets', true);
-
   return (
 
     <Inicio>

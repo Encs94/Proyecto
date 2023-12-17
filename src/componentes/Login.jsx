@@ -75,6 +75,7 @@ function Login() {
 
   // Peticion POST para AGREGAR NUEVO USUARIO
   const agregar = () => {
+    var expresionContraseña = /^(?=.*[A-Z])(?=.*[!@#$%^&*()_+])(.{6,})$/;
     var pasar2 = true;
     const hash = hashToken(usuario.nombre);
     // Traigo los usuarios
@@ -95,36 +96,42 @@ function Login() {
       .then(() => {
         // Usurio no esta registrado y PASA
         if(pasar2 === true){
-  
-          axios.post('http://localhost:8080/api', {
-            usuario: usuario.nombre,
-            contraseña: contraseña,
-            token: hash
-          })
-          .then(response => {
-            // Si la respuesta es 200 seteo el usuario y estar logueado a true
-            if (response.status === 200) {
-              setLogueado(true);
-              setUsuario({
-                nombre: usuario.nombre,
-                id: response.data.id
-              })
+          if(expresionContraseña.test(contraseña)){
+            axios.post('http://localhost:8080/api', {
+              usuario: usuario.nombre,
+              contraseña: contraseña,
+              token: hash
+            })
+            .then(response => {
+              // Si la respuesta es 200 seteo el usuario y estar logueado a true
+              if (response.status === 200) {
+                setLogueado(true);
+                setUsuario({
+                  nombre: usuario.nombre,
+                  id: response.data.id
+                })
 
-              // Creo la cookie con la que voy a mantener la sesión iniciada (durante 1 hora)
-              const fechaExpiracion = new Date(); // Creo fecha en la que estamos
-              fechaExpiracion.setTime(fechaExpiracion.getTime() + 60 * 60 * 1000); // Le sumo una hora a la hora actual
-              document.cookie = `User=${hash}; expires=${fechaExpiracion.toUTCString()}`;
+                // Creo la cookie con la que voy a mantener la sesión iniciada (durante 1 hora)
+                const fechaExpiracion = new Date(); // Creo fecha en la que estamos
+                fechaExpiracion.setTime(fechaExpiracion.getTime() + 60 * 60 * 1000); // Le sumo una hora a la hora actual
+                document.cookie = `User=${hash}; expires=${fechaExpiracion.toUTCString()}`;
 
-              Swal.fire('Usuario Añadido!');
-              navigate('/');
-            }
-          })
+                Swal.fire('Usuario Añadido!');
+                navigate('/');
+              }
+            })
+          }
+          else {
+            Swal.fire({
+              title: "La contraseña debe tener 6 caracteres mínimo, una mayúscula y un caracter especial",
+              icon: "error"
+            })
+          }
         }
       })
       .catch(error => {
         console.error('Error al obtener los datos:', error);
     });
-
     
   }
 
@@ -133,8 +140,19 @@ function Login() {
       <div className='contenedorLogin'>
         <div className='login'>
           <span className='spanLogin'>{palabra}</span>
-          <input onFocus={() => setPalabra("Usuario")} onChange={(e) => user(e.target.value)} className='botonesLogin usuario'/>
-          <input type='password' onFocus={() => setPalabra("Contraseña")} onChange={(e) => pass(e.target.value)} className='botonesLogin usuario'/>
+          <input 
+            onFocus={() => setPalabra("Usuario")} 
+            onChange={(e) => user(e.target.value)} 
+            className='botonesLogin usuario'
+            required
+          />
+          <input 
+            type='password' 
+            onFocus={() => setPalabra("Contraseña")} 
+            onChange={(e) => pass(e.target.value)} 
+            className='botonesLogin usuario' 
+            required
+          />
           <button onClick={comprobar} className='botonesLogin entrarLogin'>Entrar</button>
           <button onClick={agregar}>Agregar Usuario</button>
         </div>

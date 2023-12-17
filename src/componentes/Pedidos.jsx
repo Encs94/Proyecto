@@ -14,10 +14,10 @@ function Pedidos() {
   const navigate = useNavigate();
   const [precioTotal, setPrecioTotal] = useState();
   var pedidos = [];
-  var precio = 0;
+  var precio = [];
   var objetopedidos = {pedido: "", fecha: ""};
 
-
+  // console.log(usuario.id)
   useEffect(() => {
     
     axios.post(`http://localhost:8080/api/encontrarPed/${usuario.id}`)
@@ -29,31 +29,36 @@ function Pedidos() {
           var mes = fechaCompleta.getMonth() + 1;
           var año = fechaCompleta.getFullYear();
           var fechaFormateada = `${dia}-${mes}-${año}`
-          // Termino formateo fecha
-
-          objetopedidos = {pedido: JSON.parse(response.data[i].pedido), fecha: fechaFormateada}
+          // Meto los pedidos y la fecha de cada uno en un objeto y cada objeto en un array
+          objetopedidos = {pedido: JSON.parse(response.data[i].pedido), fecha: fechaFormateada};
           pedidos.push(objetopedidos);
         }
         setDataPedidos(pedidos);
-        for(var i = 0; i < response.data.length; i++){
-          console.log(response.data[i].pedido);
-          // for(var j = 0; j < response.data[i].pedido.length; j++){
-          //   console.log(response.data[i].pedido)
-            // console.log(response.data[i].pedido[j].cantidad * response.data[i].pedido[j].precio)
-            // precio += response.data[i].pedido[j].cantidad * response.data[i].pedido[j].precio;
-            // console.log(precio)
-            // console.log(response.data[i].pedido[j].cantidad)
-          // }
-        }
-        // console.log(precio);
-        setPrecioTotal(precio);
-        
 
+        // Sacar precio total de cada pedido
+        // Parseo el objeto
+        var pedidoTotal = [];
+        for(var i = 0; i < response.data.length; i++){
+          pedidoTotal.push(JSON.parse(response.data[i].pedido))
+        }
+        // Meto cada objeto en un array
+        var pedidoUnico = [];
+        for(var i = 0; i < pedidoTotal.length; i++) {
+          pedidoUnico.push(pedidoTotal[i]);
+        }
+        // Recorro cada pedido para sacar el precio total de este
+        for(var i = 0; i < pedidoUnico.length; i++){
+          var precioPedido = 0;
+          for(var j = 0; j < pedidoUnico[i].length; j++){
+            precioPedido += pedidoUnico[i][j].cantidad * pedidoUnico[i][j].precio;
+          }
+          precio.push(precioPedido);
+        }
+        setPrecioTotal(precio);
+        // Fin sacar precio total de cada pedido
       })
-      // .then(() => {
-        
-      // })
       .catch(error => {
+        console.log(error)
         Swal.fire({
           title: "Aún no tiene pedidos realizados"
         })
@@ -68,59 +73,58 @@ function Pedidos() {
 
   return (
     <Inicio>
-      <div className='containerTituloPedidos'>
-        <h1>Tus Pedidos</h1>
-      </div>
-      <div className='containerPedidos'>
-        <div className='containerPedidos2'>
-          {dataPedidos !== undefined 
-          ?
-            // Pedido entero
-            dataPedidos.map((pedidoFull, i) => (
-              <div className='pedidoEntero' key={i}>
-                <h3 className='margenPedido numeroPedido'>Pedido {i + 1}</h3>
-                <div className='pedidoEntero2'>
-                  {/* Cada producto del pedido */}
-                  {pedidoFull.pedido.map((producto, k) => (
-                    <div key={k} className='productoPedido'>
-                      <img className='imagenesPedidos' src={imagenes('./'+ producto.imagen +'.jpg')} alt={producto.nombre}/>
-                      {/* <div className=''> */}
-                        <div className='margenPedido nombreProductoPedido'>
-                          <strong>Nombre: </strong>
-                          <span className='marger5px'>{producto.nombre}</span>
-                        </div>
-                        <div className='margenPedido nombreProductoPedido'>
-                          <strong>Precio:</strong>
-                          <span className='marger5px'>{producto.precio}€</span>
-                        </div>
-                        <div className='margenPedido nombreProductoPedido'>
-                          <strong>Cantidad:</strong>
-                          <span className='marger5px'>{producto.cantidad}</span>
-                        </div>
-
-                      {/* </div> */}
-                    </div>
-                  )) }
-                </div>
-
-                <div className='precioFecha'>
-                  <div className='precioPedidos'>
-                    <span>Total: </span>
-                    <span>{precioTotal}</span>
-                  </div>
-                  <div className='fechaPedidos'>
-                    <span>Fecha de creación:</span>
-                    <span>{pedidoFull.fecha}</span>
-                  </div>
-                </div>
-              </div>
-            ))
-          :
-            <h2>Aún no tiene pedidos</h2>
-
-          }
+      <div className='containerColor'>
+        <div className='containerTituloPedidos'>
+          <h1>Tus Pedidos</h1>
         </div>
-        <button onClick={()=>volver()}>Volver</button>
+        <div className='containerPedidos'>
+          <div className='containerPedidos2'>
+            {dataPedidos !== undefined 
+            ?
+              // Pedido entero
+              dataPedidos.map((pedidoFull, i) => (
+                <div className='pedidoEntero' key={i}>
+                  <h3 className='margenPedido numeroPedido'>Pedido {i + 1}</h3>
+                  <div className='pedidoEntero2'>
+                    {/* Cada producto del pedido */}
+                    {pedidoFull.pedido.map((producto, k) => (
+                      <div key={k} className='productoPedido'>
+                        <img className='imagenesPedidos' src={imagenes('./'+ producto.imagen +'.jpg')} alt={producto.nombre}/>
+                          <div className='margenPedido nombreProductoPedido'>
+                            <strong>Nombre: </strong>
+                            <span className='marger5px'>{producto.nombre}</span>
+                          </div>
+                          <div className='margenPedido nombreProductoPedido'>
+                            <strong>Precio:</strong>
+                            <span className='marger5px'>{producto.precio}€</span>
+                          </div>
+                          <div className='margenPedido nombreProductoPedido'>
+                            <strong>Cantidad:</strong>
+                            <span className='marger5px'>{producto.cantidad}</span>
+                          </div>
+                      </div>
+                    )) }
+                  </div>
+
+                  <div className='precioFecha'>
+                    <div className='precioPedidos'>
+                      <span><b>Total:</b> </span>
+                      <span>{precioTotal[i]} €</span>
+                    </div>
+                    <div className='fechaPedidos'>
+                      <span><b>Fecha de creación:</b></span>
+                      <span>{pedidoFull.fecha}</span>
+                    </div>
+                  </div>
+                </div>
+              ))
+            :
+              <h2>Aún no tiene pedidos</h2>
+
+            }
+          </div>
+          <button className='margenAbajo botonProducto' onClick={()=>volver()}>Volver</button>
+        </div>
       </div>
     </Inicio>
   )
