@@ -35,7 +35,7 @@ function Eventos() {
               <h3>Expo Comic Barcelona</h3>
               <div>
                 <ol>
-                  <li type='circle'>Fecha: 17/05/2024</li>
+                  <li type='circle'>Fecha: 4/05/2024</li>
                   <li type='circle'>Lugar: Barcelona</li>
                   <li type='circle'>Precio entrada: 12€</li>
                   <li type='circle'>Más información <a className='enlaceEventos' href="https://www.comic-barcelona.com/es/inicio.cfm">aquí</a></li>

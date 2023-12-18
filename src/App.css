@@ -232,6 +232,7 @@ body {
   .spans {
     padding-right: 10px;
     padding-left: 10px;
+    font-size: 10px;
   }
 }
 
@@ -245,7 +246,12 @@ body {
 @media (max-width: 426px){
   .copy {
     margin-right: 20px;
+    font-size: 10px;
   }
+}
+
+.iconosFooter {
+  padding-right: 5px;
 }
 
 /* ----------------  INICIO/HOME  ---------------- */
@@ -372,6 +378,7 @@ body {
   .buscadores {
     margin-bottom: 35px;
     flex-direction: column;
+    margin-top: 0;
   }
 }
 
@@ -416,6 +423,8 @@ body {
 @media (max-width: 426px) {
   .buscador{
     width: 60%;
+    margin-left: 0;
+    margin-bottom: 10px;
   }
 }
 
@@ -429,22 +438,24 @@ body {
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
-  background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="orange" class="bi bi-caret-up-fill" viewBox="0 0 16 16"><path d="m7.247 4.86-4.796 5.481c-.566.647-.106 1.659.753 1.659h9.592a1 1 0 0 0 .753-1.659l-4.796-5.48a1 1 0 0 0-1.506 0z"/></svg>') no-repeat right center;
+  background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="%23FF6127" class="bi bi-caret-up-fill" viewBox="0 0 16 16"><path d="M0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm4 4a.5.5 0 0 0-.374.832l4 4.5a.5.5 0 0 0 .748 0l4-4.5A.5.5 0 0 0 12 6z"/></svg>') no-repeat right center;
   background-size: 100%;
   border: none;
   outline: none;
-  margin-right: 80px;
+  margin-right: 120px; /* Aumenta el margen derecho según sea necesario */
   margin-left: 20px;
+  padding-right: 40px; 
 }
 @media (max-width: 426px) {
   .flecha{
     margin-right: 30px;
+    margin-bottom: 10px;
   }
 }
 
 .seleccion2 {
   width: 30px;
-  height: 40px;
+  height: 30px;
   flex: 0 0 10px;
 }
 
@@ -475,6 +486,7 @@ body {
   margin-right: 20px;
   color: white;
   font-size: 20px;
+  margin-left: 10px;
 }
 @media(max-width: 426px){
   .nombreProducto {
@@ -981,11 +993,23 @@ body {
   }
 }
 
+.mensajeError {
+  color: orange;
+  font-weight: bold;
+  margin-top: 5px;
+}
 
 /* --------------  PEDIDOS  -------------- */
 
 .containerColor {
   background-color: #272727;
+  height: 100%;
+  min-height: 447px;
+}
+@media (max-width: 426px){
+  .containerColor{
+    min-height: 600px;
+  }
 }
 
 .containerTituloPedidos {
@@ -1099,8 +1123,21 @@ body {
 .marger5px {
   margin-left: 5px;
 }
+
 .margenAbajo {
   margin-bottom: 20px;
+}
+
+.sinPedidos {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* height: ; */
+  margin-bottom: 50px;
+}
+
+.travolta {
+  width: 600px;
 }
 
 /* RESPONSIVE */

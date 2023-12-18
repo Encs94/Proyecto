@@ -1,5 +1,5 @@
 import React, {useContext} from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import '../../App.css';
 import Contexto from '../../Contexto/Contexto';
 import logo from '../../assets/Logo.svg';
@@ -7,6 +7,7 @@ import logo from '../../assets/Logo.svg';
 function Header() {
 
   const {usuario, logueado, setUsuario, setLogueado} = useContext(Contexto);
+  const navigate = useNavigate()
 
   const cerrarSesion = () => {
     console.log(usuario);
@@ -14,6 +15,7 @@ function Header() {
     document.cookie = `User=; expires=${fechaActual.toUTCString()}`;
     setUsuario(null);
     setLogueado(false);
+    navigate("/");
   }
 
   return (

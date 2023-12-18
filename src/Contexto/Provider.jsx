@@ -48,7 +48,6 @@ export default function Provider({children}) {
             .then(response => {
               for(var i = 0; i < response.data.length; i++){
                 if(deshashToken(response.data[i].token) === cookieDeshash){
-                  console.log("Dentro del if");
                   user = response.data[i].usuario;
                   id = response.data[i].id;
                   log = true;
@@ -58,9 +57,6 @@ export default function Provider({children}) {
                   break;
                 }
               }
-            })
-            .then(() => {
-              console.log(logueado)
             })
             .catch(error => {
               console.error('Error al obtener los datos:', error);

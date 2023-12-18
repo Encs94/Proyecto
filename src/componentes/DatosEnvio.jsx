@@ -5,11 +5,13 @@ import { useContext } from 'react';
 import Contexto from '../Contexto/Contexto';
 import axios from 'axios';
 import Swal from 'sweetalert2';
+import { useNavigate } from 'react-router-dom';
 
 export default function DatosEnvio() {
 
   const { usuario } = useContext(Contexto);
   const {register, handleSubmit, formState:{errors}} = useForm();
+  const navigate = useNavigate();
 
   const guardarDatos = (datos) => {
     const datosString = JSON.stringify(datos);
@@ -27,6 +29,9 @@ export default function DatosEnvio() {
           })
         }
       })
+      .then(() => 
+        navigate("/")
+      )
       .catch(error => {
         console.error('Error al obtener los datos:', error);
       });
@@ -76,7 +81,7 @@ export default function DatosEnvio() {
                 {pattern:/^[69]\d{8}$/})} required />
               </div>
               {errors.telefono?.type === "pattern" && 
-              alert("El teléfono debe emprezar por 6 o 9 y tener 9 dígitos")}
+              <span className='mensajeError'>El teléfono debe emprezar por 6 o 9 y tener 9 dígitos</span>}
 
               <div className='apartadoForm'>
                 <label className='labelDatos' htmlFor="email">Email</label>
@@ -86,7 +91,7 @@ export default function DatosEnvio() {
                 )} required />
               </div>
               {errors.email?.type === "pattern" && 
-              alert("Email no válido")}
+              <span className='mensajeError'>Email no válido</span>}
 
               <div className='apartadoForm'>
                 <label className='labelDatos' htmlFor="pago">Añadir tarjeta</label>
@@ -96,7 +101,7 @@ export default function DatosEnvio() {
                 )} required />
               </div>
               {errors.pago?.type === "pattern" && 
-              alert("IBAN incorrecto")}
+            <span className='mensajeError'>IBAN incorrecto</span>}
 
               <div className='divBoton'>
                 <button className='margenBotonEnvio botonProducto'>Comprar</button>

@@ -57,7 +57,6 @@ function Carrito() {
       })
       .then(response => {
         if (response.status === 200) {
-          console.log("ok");
           navigate('/datosEnvio');
         }
       })
@@ -72,7 +71,6 @@ function Carrito() {
         icon: "error"
       })
     }
-    console.log("pedidoString" + pedidoString)
   }
 
 

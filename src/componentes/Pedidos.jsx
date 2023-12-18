@@ -5,21 +5,25 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import Inicio from './Plantilla';
+import travolta from '../assets/travoltaPedidos.gif';
 
 function Pedidos() {
 
   const {usuario} = useContext(Contexto);
   const imagenes = require.context('./../assets', true);
-  const [dataPedidos, setDataPedidos] = useState();
+  const [dataPedidos, setDataPedidos] = useState([]);
   const navigate = useNavigate();
   const [precioTotal, setPrecioTotal] = useState();
   var pedidos = [];
   var precio = [];
   var objetopedidos = {pedido: "", fecha: ""};
 
-  // console.log(usuario.id)
   useEffect(() => {
-    
+    if(usuario.id === ""){
+      return
+    }
+    try{
+    console.log(usuario.id);
     axios.post(`http://localhost:8080/api/encontrarPed/${usuario.id}`)
       .then(response => {
         for(var i = 0; i < response.data.length; i++){
@@ -58,11 +62,14 @@ function Pedidos() {
         // Fin sacar precio total de cada pedido
       })
       .catch(error => {
-        console.log(error)
-        Swal.fire({
-          title: "Aún no tiene pedidos realizados"
-        })
+        if (error.response && error.response.status === 404) {
+          console.log("El error: " + error.message);
+        }
       });
+    }
+    catch{
+      console.log("Fallo")
+    }
   }, [usuario.id]);
 
 
@@ -79,7 +86,8 @@ function Pedidos() {
         </div>
         <div className='containerPedidos'>
           <div className='containerPedidos2'>
-            {dataPedidos !== undefined 
+            {console.log(dataPedidos)}
+            {dataPedidos.length !== 0
             ?
               // Pedido entero
               dataPedidos.map((pedidoFull, i) => (
@@ -119,8 +127,9 @@ function Pedidos() {
                 </div>
               ))
             :
-              <h2>Aún no tiene pedidos</h2>
-
+            <div className='sinPedidos'>
+              <img className='travolta' src={travolta}></img>
+            </div>
             }
           </div>
           <button className='margenAbajo botonProducto' onClick={()=>volver()}>Volver</button>

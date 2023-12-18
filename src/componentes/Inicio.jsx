@@ -20,9 +20,25 @@ export default function Tienda() {
   const {setPedido, logueado} = useContext(Contexto);
   const [nombres, setNombres] = useState();
   const [mostrarOcultar, setMostrarOcultar] = useState("ocultarDiv");
-  const [categorias, setCategorias] = useState();
+  const [categorias, setCategorias] = useState("");
   const navigate = useNavigate();
   var carro = [];
+
+  // axios.interceptors.response.use(
+  //   response => response,
+  //   error => {
+  //     if (error.response && error.response.status === 404) {
+  //       // Manejar el error sin imprimir a la consola
+  //       return Promise.reject(error);
+  //     }
+  //     // Resto del código para manejar otros errores
+  //     Swal.fire({
+  //       title: "Aún no tiene pedidos realizados"
+  //     });
+  //     console.error(error);
+  //     return Promise.reject(error);
+  //   }
+  // );
   
 
   // Traer los productos 
@@ -53,7 +69,8 @@ export default function Tienda() {
       axios.get('http://localhost:8080/api/prods')
       .then(response => {
         setData(response.data);
-        setCategorias(undefined);
+        setMostrarOcultar("ocultarDiv");
+        // setCategorias(undefined);
       })
       .catch(error => {
         console.error('Error al obtener los datos:', error);
@@ -64,6 +81,7 @@ export default function Tienda() {
       .then(response => {
         setData(response.data);
         setCategorias(nuevaCategoria);
+        setMostrarOcultar("ocultarDiv");
       })
       .catch(error => {
         console.error('Error al obtener los datos:', error);
@@ -72,20 +90,23 @@ export default function Tienda() {
     }
   }
 
-  // Busqueda por letra
+  // Busqueda por letra o letra y categoria
 
   const busquedaletras = (e) => {
     const letra = e.target.value;
     const letraMinus = letra.toLowerCase();
     var pasar = false;
     console.log(categorias)
+    // Compruebo si el texto en "letra" esta en el array de nombres
     if(letra !== ""){
       for(var i = 0; i < nombres.length; i++){
         if(letraMinus === nombres[i].substring(0, letraMinus.length).toLowerCase()){
           pasar = true;
         }
       }
+      // Si el texto esta en alguno de los nombres
       if(pasar === true ){
+        // Si categorias esta activo
         if(categorias !== undefined){
           axios.post(`http://localhost:8080/api/prodLetra`,{
           letra: letra,
@@ -99,6 +120,7 @@ export default function Tienda() {
             console.log('Error al obtener los datos:');
           });
         }
+        // Si no he pulsado categorias
         if(categorias === undefined){
           axios.post(`http://localhost:8080/api/prodLetra`,{
           letra: letra,
@@ -115,6 +137,21 @@ export default function Tienda() {
         
       }
     }
+    // Si letra esta vacio pero categorias no (Para cuando el usuario este en una categoria pero borre todas las letras del buscador)
+    if(letra === "" && categorias !== 0){
+      axios.post(`http://localhost:8080/api/prodLetra`,{
+      letra: "",
+      idCategoria: categorias
+      })
+      .then(response => {
+        setData(response.data);
+        setMostrarOcultar("ocultarDiv");
+      })
+      .catch(error => {
+        console.log('Error al obtener los datos:');
+      });
+    }
+    // Si no encuentra ninguna coincidencia y no ha elegido categorias, me saca todo los productos
     if(letra === "" || pasar === false){
       if(pasar === false && letra !== ""){
         setMostrarOcultar("mostrarDiv");
@@ -126,6 +163,10 @@ export default function Tienda() {
       .catch(error => {
         console.error('Error al obtener los datos:', error);
       });
+    }
+
+    if(data === ""){
+      setMostrarOcultar("mostrarDiv");
     }
   }
 
@@ -191,7 +232,7 @@ export default function Tienda() {
           <input onChange={busquedaletras} className='buscador' placeholder='    Buscar productos'/>
           <div>
             <select className='seleccion2 flecha' onChange={filtrarCategorias}>
-              <option className='opcion' value="0"></option>
+              <option className='opcion' value="0">Productos</option>
               <option className='opcion' value="1">Mangas</option>
               <option className='opcion' value="2">Comincs</option>
               <option className='opcion' value="3">Figuras</option>
