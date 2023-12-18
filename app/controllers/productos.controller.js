@@ -105,14 +105,22 @@ exports.findByCategory = async (req, res) => {
 exports.findByLetra = async (req, res) => {
 
   const letra = req.body.letra;
-  const idCategoria = req.body.idCategoria;
 
   var producto;
 
   try {
 
+    // Busqueda por categoria
+    if(req.body.idCategoria !== "" && letra === ""){
+      producto = await Producto.findAll({
+      where: {
+        idCategory: req.body.idCategoria
+      }
+    });
+    }
+
     // Busqueda solo por letra
-    if(idCategoria === ""){
+    if(req.body.idCategoria === ""){
       console.log("Hola")
       producto = await Producto.findAll({
         where: {
@@ -124,14 +132,13 @@ exports.findByLetra = async (req, res) => {
     }
 
     // Busqueda por letra y categoria
-    if(idCategoria !== ""){
-      console.log("Adios")
+    if(req.body.idCategoria !== ""){
       producto = await Producto.findAll({
         where: {
           nombre: {
             [Op.like]: `%${letra}%`
           },
-          idCategory: idCategoria
+          idCategory: req.body.idCategoria
         }
       });
     }
@@ -140,9 +147,7 @@ exports.findByLetra = async (req, res) => {
       res.send(producto);
     } 
     else {
-      res.status(404).send({
-        message: `No producto found with letra=${letra}.`
-      });
+      res.send([]);
     }
   } catch (err) {
     res.status(500).send({

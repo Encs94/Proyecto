@@ -44,9 +44,7 @@ exports.findByIdUsuario = async (req, res) => {
     if (pedido.length > 0) {
       res.send(pedido);
     } else {
-      res.status(404).send({
-        message: `No pedido found with idUser=${idUser}.`
-      });
+      res.send([]);
     }
   } catch (err) {
     res.status(500).send({
