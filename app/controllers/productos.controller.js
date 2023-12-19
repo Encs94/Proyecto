@@ -78,7 +78,6 @@ exports.findOne = (req, res) => {
 
 exports.findByCategory = async (req, res) => {
   const categoria = req.params.categoria;
-
   try {
     const producto = await Producto.findAll({
       where: {
@@ -89,9 +88,7 @@ exports.findByCategory = async (req, res) => {
     if (producto.length > 0) {
       res.send(producto);
     } else {
-      res.status(404).send({
-        message: `No producto found with categoria=${categoria}.`
-      });
+      res.send([]);
     }
   } catch (err) {
     res.status(500).send({
@@ -100,12 +97,11 @@ exports.findByCategory = async (req, res) => {
   }
 };
 
-// Buscar por letra y categoria
 
+// Buscar por letra y categoria
 exports.findByLetra = async (req, res) => {
 
   const letra = req.body.letra;
-
   var producto;
 
   try {
@@ -113,10 +109,22 @@ exports.findByLetra = async (req, res) => {
     // Busqueda por categoria
     if(req.body.idCategoria !== "" && letra === ""){
       producto = await Producto.findAll({
-      where: {
-        idCategory: req.body.idCategoria
-      }
-    });
+        where: {
+          idCategory: req.body.idCategoria
+        }
+      });
+    }
+    // Buscar por categria y letra
+    if(req.body.idCategoria !== "" && letra !== ""){
+      console.log("Estamos dentro")
+      producto = await Producto.findAll({
+        where: {
+          idCategory: req.body.idCategoria,
+          nombre: {
+            [Op.like]: `%${letra}%`
+          }
+        }
+      });
     }
 
     // Busqueda solo por letra
@@ -132,16 +140,16 @@ exports.findByLetra = async (req, res) => {
     }
 
     // Busqueda por letra y categoria
-    if(req.body.idCategoria !== ""){
-      producto = await Producto.findAll({
-        where: {
-          nombre: {
-            [Op.like]: `%${letra}%`
-          },
-          idCategory: req.body.idCategoria
-        }
-      });
-    }
+    // if(req.body.idCategoria !== ""){
+    //   producto = await Producto.findAll({
+    //     where: {
+    //       nombre: {
+    //         [Op.like]: `%${letra}%`
+    //       },
+    //       idCategory: req.body.idCategoria
+    //     }
+    //   });
+    // }
 
     if (producto.length > 0) {
       res.send(producto);
