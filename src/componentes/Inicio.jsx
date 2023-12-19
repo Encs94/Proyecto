@@ -18,43 +18,21 @@ export default function Tienda() {
   const imagenes = require.context('./../assets', true);
   const [data, setData] = useState([]);
   const {setPedido, logueado} = useContext(Contexto);
-  const [nombres, setNombres] = useState();
+  // const [nombres, setNombres] = useState();
   const [mostrarOcultar, setMostrarOcultar] = useState("ocultarDiv");
   const [categorias, setCategorias] = useState("");
+  const [letras, setLetras] = useState("");
   const navigate = useNavigate();
   var carro = [];
-
-  // axios.interceptors.response.use(
-  //   response => response,
-  //   error => {
-  //     if (error.response && error.response.status === 404) {
-  //       // Manejar el error sin imprimir a la consola
-  //       return Promise.reject(error);
-  //     }
-  //     // Resto del código para manejar otros errores
-  //     Swal.fire({
-  //       title: "Aún no tiene pedidos realizados"
-  //     });
-  //     console.error(error);
-  //     return Promise.reject(error);
-  //   }
-  // );
   
 
-  // Traer los productos 
-
+  // Traer los productos al iniciar la página
   useEffect(() => {
-    const nombres = new Set();
-    // Realizar la petición GET cuando el componente se monte
+    console.log("hola")
+    // Realizar la petición GET cuando el componente se renderice
     axios.get('http://localhost:8080/api/prods')
       .then(response => {
         setData(response.data);
-        // Saco todas las letras distintas de los diferentes nombres
-        for(var i = 0; i < response.data.length; i++){
-          nombres.add(response.data[i].nombre.toLowerCase());
-        }
-        const arrayNombres = Array.from(nombres);
-        setNombres(arrayNombres);
       })
       .catch(error => {
         console.error('Error al obtener los datos:', error);
@@ -64,19 +42,69 @@ export default function Tienda() {
 
   // Busqueda por categoria
   const filtrarCategorias = (e) => {
-    const nuevaCategoria = e.target.value
-    if(e.target.value === "0"){
+    const nuevaCategoria = e.target.value;
+    console.log(e.target.value)
+
+    // Si letras esta vacio y categoria es productos ("0") que saque todos los productos
+    if(e.target.value === "0" && letras === ""){
+      console.log("primer if Categoria")
       axios.get('http://localhost:8080/api/prods')
       .then(response => {
         setData(response.data);
         setMostrarOcultar("ocultarDiv");
-        // setCategorias(undefined);
+        setCategorias(nuevaCategoria);
       })
       .catch(error => {
         console.error('Error al obtener los datos:', error);
       });
     }
-    else{
+    // Si letras NO esta vacio y categoria es productos ("0") que saque todos los productos con ese nombre
+    if(e.target.value === "0" && letras !== ""){
+      console.log("segundo if Categorias. Letras: " + letras + " Categoria: " + e.target.value)
+      axios.post(`http://localhost:8080/api/prodLetra`,{
+      letra: letras,
+      idCategoria: ""
+      })
+      .then(response => {
+        setData(response.data);
+        setCategorias(nuevaCategoria);
+        if(Object.keys(response.data).length === 0){
+          setMostrarOcultar("mostrarDiv");
+        }
+        else{
+          setMostrarOcultar("ocultarDiv");
+        }
+      })
+      .catch(error => {
+        console.log('Error al obtener los datos:');
+      });
+    }
+    // Si hay alguna categoria y hay letras, que busque en esa categoria productos con ese nombre
+    if(letras !== "" && e.target.value !== "0"){
+      var category = e.target.value;
+      console.log("tercer if Categoria. Letra: " + letras + "Categoria: " + category)
+      axios.post(`http://localhost:8080/api/prodLetra`,{
+      letra: letras,
+      idCategoria: category
+      })
+      .then(response => {
+        setData(response.data);
+        setCategorias(nuevaCategoria);
+        if(Object.keys(response.data).length === 0){
+          setMostrarOcultar("mostrarDiv");
+        }
+        else{
+          setMostrarOcultar("ocultarDiv");
+        }
+        
+      })
+      .catch(error => {
+        console.log('Error al obtener los datos:');
+      });
+    }
+    // Si no entra que me saque todos los productos de la categoria
+    if(e.target.value !== "0" && letras === ""){
+      console.log("Estoy en el cuarto id de categoria")
       axios.post(`http://localhost:8080/api/prodCategory/${nuevaCategoria}`)
       .then(response => {
         setData(response.data);
@@ -91,82 +119,87 @@ export default function Tienda() {
   }
 
   // Busqueda por letra o letra y categoria
-
   const busquedaletras = (e) => {
     const letra = e.target.value;
-    const letraMinus = letra.toLowerCase();
-    var pasar = false;
+    setLetras(letra);
+    console.log(letra)
     console.log(categorias)
-    // Compruebo si el texto en "letra" esta en el array de nombres
-    if(letra !== ""){
-      for(var i = 0; i < nombres.length; i++){
-        if(letraMinus === nombres[i].substring(0, letraMinus.length).toLowerCase()){
-          pasar = true;
-        }
-      }
-      // Si el texto esta en alguno de los nombres
-      if(pasar === true ){
-        // Si categorias esta activo
-        if(categorias !== undefined){
-          axios.post(`http://localhost:8080/api/prodLetra`,{
-          letra: letra,
-          idCategoria: categorias
-          })
-          .then(response => {
-            setData(response.data);
+      // Si categorias esta activo y letra tambien
+      if((categorias !== "" && categorias !== "0") && letra !== ""){
+        axios.post(`http://localhost:8080/api/prodLetra`,{
+        letra: letra,
+        idCategoria: categorias
+        })
+        .then(response => {
+          setData(response.data);
+          console.log("Datos primer if" + typeof(response.data))
+
+          if(Object.keys(response.data).length === 0){
+            setMostrarOcultar("mostrarDiv");
+          }
+          else{
             setMostrarOcultar("ocultarDiv");
-          })
-          .catch(error => {
-            console.log('Error al obtener los datos:');
-          });
-        }
-        // Si no he pulsado categorias
-        if(categorias === undefined){
-          axios.post(`http://localhost:8080/api/prodLetra`,{
-          letra: letra,
-          idCategoria: ""
-          })
-          .then(response => {
-            setData(response.data);
-            setMostrarOcultar("ocultarDiv");
-          })
-          .catch(error => {
-            console.log('Error al obtener los datos:');
-          });
-        }
-        
+          }
+          
+        })
+        .catch(error => {
+          console.log('Error al obtener los datos:');
+        });
       }
-    }
+      // Si letra esta escrito y no he pulsado categorias o categorias es productos
+      if((categorias === "0" || categorias === "") && letra !== ""){
+        axios.post(`http://localhost:8080/api/prodLetra`,{
+        letra: letra,
+        idCategoria: ""
+        })
+        .then(response => {
+          setData(response.data);
+          if(Object.keys(response.data).length === 0){
+            setMostrarOcultar("mostrarDiv");
+          }
+          else{
+            setMostrarOcultar("ocultarDiv");
+          }
+        })
+        .catch(error => {
+          console.log('Error al obtener los datos:');
+        });
+      }
+ 
     // Si letra esta vacio pero categorias no (Para cuando el usuario este en una categoria pero borre todas las letras del buscador)
-    if(letra === "" && categorias !== 0){
+    if(letra === "" && (categorias !== "0" || categorias !== "")){
       axios.post(`http://localhost:8080/api/prodLetra`,{
       letra: "",
       idCategoria: categorias
       })
       .then(response => {
         setData(response.data);
-        setMostrarOcultar("ocultarDiv");
+        if(Object.keys(response.data).length === 0){
+          setMostrarOcultar("mostrarDiv");
+        }
+        else{
+          setMostrarOcultar("ocultarDiv");
+        }
       })
       .catch(error => {
         console.log('Error al obtener los datos:');
       });
     }
     // Si no encuentra ninguna coincidencia y no ha elegido categorias, me saca todo los productos
-    if(letra === "" || pasar === false){
-      if(pasar === false && letra !== ""){
-        setMostrarOcultar("mostrarDiv");
-      }
+    if(letra === "" && (categorias === "0" || categorias === "")){
       axios.get('http://localhost:8080/api/prods')
       .then(response => {
         setData(response.data);
+        if(Object.keys(response.data).length === 0){
+          setMostrarOcultar("mostrarDiv");
+        }
+        else{
+          setMostrarOcultar("ocultarDiv");
+        }
       })
       .catch(error => {
         console.error('Error al obtener los datos:', error);
       });
-    }
-
-    if(data === ""){
-      setMostrarOcultar("mostrarDiv");
     }
   }
 
@@ -232,11 +265,11 @@ export default function Tienda() {
           <input onChange={busquedaletras} className='buscador' placeholder='    Buscar productos'/>
           <div>
             <select className='seleccion2 flecha' onChange={filtrarCategorias}>
-              <option className='opcion' value="0">Productos</option>
-              <option className='opcion' value="1">Mangas</option>
-              <option className='opcion' value="2">Comincs</option>
-              <option className='opcion' value="3">Figuras</option>
-              <option className='opcion' value="4">Juegos</option>
+              <option className='option' value="0">Productos</option>
+              <option className='option' value="1">Mangas</option>
+              <option className='option' value="2">Comincs</option>
+              <option className='option' value="3">Figuras</option>
+              <option className='option' value="4">Juegos</option>
             </select>
           </div>
           <div>

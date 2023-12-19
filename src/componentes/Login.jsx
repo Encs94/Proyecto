@@ -19,8 +19,6 @@ function Login() {
     const CryptoJS = require('crypto-js');
     const key = "claveRandom";
     const cifrado = CryptoJS.AES.encrypt(token, key).toString();
-  
-    console.log('Cifrado:', cifrado);
 
     return cifrado;
   }

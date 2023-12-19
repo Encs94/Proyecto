@@ -3,7 +3,7 @@ import { useContext, useState, useEffect } from 'react';
 import Contexto from '../Contexto/Contexto';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import Swal from 'sweetalert2';
+// import Swal from 'sweetalert2';
 import Inicio from './Plantilla';
 import travolta from '../assets/travoltaPedidos.gif';
 
@@ -19,12 +19,14 @@ function Pedidos() {
   var objetopedidos = {pedido: "", fecha: ""};
 
   useEffect(() => {
+
+    // Return para manejar error en caso que usuario no este seteado aún
     if(usuario.id === ""){
       return
     }
+
     try{
-    console.log(usuario.id);
-    axios.post(`http://localhost:8080/api/encontrarPed/${usuario.id}`)
+      axios.post(`http://localhost:8080/api/encontrarPed/${usuario.id}`)
       .then(response => {
         for(var i = 0; i < response.data.length; i++){
           // Formatear la fecha
@@ -86,7 +88,6 @@ function Pedidos() {
         </div>
         <div className='containerPedidos'>
           <div className='containerPedidos2'>
-            {console.log(dataPedidos)}
             {dataPedidos.length !== 0
             ?
               // Pedido entero
@@ -112,8 +113,10 @@ function Pedidos() {
                           </div>
                       </div>
                     )) }
+                    {/* Fin de cada producto */}
                   </div>
-
+                  
+                  {/* Información sobre el pedido */}
                   <div className='precioFecha'>
                     <div className='precioPedidos'>
                       <span><b>Total:</b> </span>

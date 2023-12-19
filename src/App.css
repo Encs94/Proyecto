@@ -357,6 +357,11 @@ body {
 .ocultarDiv {
   visibility: hidden;
 }
+@media (max-width: 426px){
+  .avisoNoHayProductos {
+    width: 20%;
+  }
+}
 
 .mostrarDiv {
   visibility: visible;
@@ -365,6 +370,11 @@ body {
 .h2NoProductos {
   color: white;
   font-size: 20px;
+}
+@media (max-width: 426px){
+  .h2NoProductos {
+    font-size: 10px;
+  }
 }
 
 .buscadores {
@@ -438,7 +448,7 @@ body {
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
-  background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="%23FF6127" class="bi bi-caret-up-fill" viewBox="0 0 16 16"><path d="M0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm4 4a.5.5 0 0 0-.374.832l4 4.5a.5.5 0 0 0 .748 0l4-4.5A.5.5 0 0 0 12 6z"/></svg>') no-repeat right center;
+  background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="%23FF6127" class="bi bi-caret-up-fill" viewBox="0 0 16 16"><path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/></svg>') no-repeat right center;
   background-size: 100%;
   border: none;
   outline: none;
@@ -451,6 +461,15 @@ body {
     margin-right: 30px;
     margin-bottom: 10px;
   }
+}
+
+.option {
+  background-color: transparent;
+  color: black;
+}
+.option:hover {
+  background-color: #ffa500;
+  color: white;
 }
 
 .seleccion2 {
