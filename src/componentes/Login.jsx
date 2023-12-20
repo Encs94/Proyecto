@@ -32,10 +32,8 @@ function Login() {
       .then(response => {
         // Comprobacion
         for(var i = 0; i < response.data.length; i++){
-          if(usuario.nombre === response.data[i].usuario && contraseña === response.data[i].contraseña){
-            
+          if(usuario.nombre === response.data[i].usuario && contraseña === response.data[i].contraseña){ 
             pasar = true;
-            console.log(pasar);
             const newUser = {
               nombre: response.data[i].usuario,
               id: response.data[i].id

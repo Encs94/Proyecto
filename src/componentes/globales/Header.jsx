@@ -10,7 +10,7 @@ function Header() {
   const navigate = useNavigate()
 
   const cerrarSesion = () => {
-    console.log(usuario);
+    // Elimino la cookie
     const fechaActual = new Date();
     document.cookie = `User=; expires=${fechaActual.toUTCString()}`;
     setUsuario(null);

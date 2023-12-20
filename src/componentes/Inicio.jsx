@@ -28,7 +28,6 @@ export default function Tienda() {
 
   // Traer los productos al iniciar la página
   useEffect(() => {
-    console.log("hola")
     // Realizar la petición GET cuando el componente se renderice
     axios.get('http://localhost:8080/api/prods')
       .then(response => {
@@ -43,11 +42,9 @@ export default function Tienda() {
   // Busqueda por categoria
   const filtrarCategorias = (e) => {
     const nuevaCategoria = e.target.value;
-    console.log(e.target.value)
 
     // Si letras esta vacio y categoria es productos ("0") que saque todos los productos
     if(e.target.value === "0" && letras === ""){
-      console.log("primer if Categoria")
       axios.get('http://localhost:8080/api/prods')
       .then(response => {
         setData(response.data);
@@ -60,7 +57,6 @@ export default function Tienda() {
     }
     // Si letras NO esta vacio y categoria es productos ("0") que saque todos los productos con ese nombre
     if(e.target.value === "0" && letras !== ""){
-      console.log("segundo if Categorias. Letras: " + letras + " Categoria: " + e.target.value)
       axios.post(`http://localhost:8080/api/prodLetra`,{
       letra: letras,
       idCategoria: ""
@@ -82,7 +78,6 @@ export default function Tienda() {
     // Si hay alguna categoria y hay letras, que busque en esa categoria productos con ese nombre
     if(letras !== "" && e.target.value !== "0"){
       var category = e.target.value;
-      console.log("tercer if Categoria. Letra: " + letras + "Categoria: " + category)
       axios.post(`http://localhost:8080/api/prodLetra`,{
       letra: letras,
       idCategoria: category
@@ -104,7 +99,6 @@ export default function Tienda() {
     }
     // Si no entra que me saque todos los productos de la categoria
     if(e.target.value !== "0" && letras === ""){
-      console.log("Estoy en el cuarto id de categoria")
       axios.post(`http://localhost:8080/api/prodCategory/${nuevaCategoria}`)
       .then(response => {
         setData(response.data);
@@ -122,49 +116,46 @@ export default function Tienda() {
   const busquedaletras = (e) => {
     const letra = e.target.value;
     setLetras(letra);
-    console.log(letra)
-    console.log(categorias)
-      // Si categorias esta activo y letra tambien
-      if((categorias !== "" && categorias !== "0") && letra !== ""){
-        axios.post(`http://localhost:8080/api/prodLetra`,{
-        letra: letra,
-        idCategoria: categorias
-        })
-        .then(response => {
-          setData(response.data);
-          console.log("Datos primer if" + typeof(response.data))
+    // Si categorias esta activo y letra tambien
+    if((categorias !== "" && categorias !== "0") && letra !== ""){
+      axios.post(`http://localhost:8080/api/prodLetra`,{
+      letra: letra,
+      idCategoria: categorias
+      })
+      .then(response => {
+        setData(response.data);
 
-          if(Object.keys(response.data).length === 0){
-            setMostrarOcultar("mostrarDiv");
-          }
-          else{
-            setMostrarOcultar("ocultarDiv");
-          }
-          
-        })
-        .catch(error => {
-          console.log('Error al obtener los datos:');
-        });
-      }
-      // Si letra esta escrito y no he pulsado categorias o categorias es productos
-      if((categorias === "0" || categorias === "") && letra !== ""){
-        axios.post(`http://localhost:8080/api/prodLetra`,{
-        letra: letra,
-        idCategoria: ""
-        })
-        .then(response => {
-          setData(response.data);
-          if(Object.keys(response.data).length === 0){
-            setMostrarOcultar("mostrarDiv");
-          }
-          else{
-            setMostrarOcultar("ocultarDiv");
-          }
-        })
-        .catch(error => {
-          console.log('Error al obtener los datos:');
-        });
-      }
+        if(Object.keys(response.data).length === 0){
+          setMostrarOcultar("mostrarDiv");
+        }
+        else{
+          setMostrarOcultar("ocultarDiv");
+        }
+        
+      })
+      .catch(error => {
+        console.log('Error al obtener los datos:');
+      });
+    }
+    // Si letra esta escrito y no he pulsado categorias o categorias es productos
+    if((categorias === "0" || categorias === "") && letra !== ""){
+      axios.post(`http://localhost:8080/api/prodLetra`,{
+      letra: letra,
+      idCategoria: ""
+      })
+      .then(response => {
+        setData(response.data);
+        if(Object.keys(response.data).length === 0){
+          setMostrarOcultar("mostrarDiv");
+        }
+        else{
+          setMostrarOcultar("ocultarDiv");
+        }
+      })
+      .catch(error => {
+        console.log('Error al obtener los datos:');
+      });
+    }
  
     // Si letra esta vacio pero categorias no (Para cuando el usuario este en una categoria pero borre todas las letras del buscador)
     if(letra === "" && (categorias !== "0" || categorias !== "")){
